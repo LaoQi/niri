@@ -436,6 +436,12 @@ impl XdgShellHandler for State {
         if surface.is_initial_configure_sent() {
             surface.send_configure();
         }
+        let wl_surface= surface.wl_surface().clone();
+        if let Some((mapped, _)) = self.niri.layout.find_window_and_output(&wl_surface) {
+            let window = mapped.window.clone();
+            self.niri.layout.set_window_height(Some(&window), niri_ipc::SizeChange::SetProportion(100.0));
+            self.niri.layout.set_window_width(Some(&window), niri_ipc::SizeChange::SetProportion(100.0));
+        }
     }
 
     fn unmaximize_request(&mut self, _surface: ToplevelSurface) {

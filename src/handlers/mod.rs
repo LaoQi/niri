@@ -9,6 +9,7 @@ use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
 
+use niri_ipc::SizeChange;
 use smithay::backend::allocator::dmabuf::Dmabuf;
 use smithay::backend::drm::DrmNode;
 use smithay::backend::input::{InputEvent, TabletToolDescriptor};
@@ -573,6 +574,14 @@ impl ForeignToplevelHandler for State {
         if let Some((mapped, _)) = self.niri.layout.find_window_and_output(&wl_surface) {
             let window = mapped.window.clone();
             self.niri.layout.set_fullscreen(&window, false);
+        }
+    }
+    
+    fn set_maximized(&mut self, wl_surface: WlSurface) {
+        if let Some((mapped, _)) = self.niri.layout.find_window_and_output(&wl_surface) {
+            let window = mapped.window.clone();
+            self.niri.layout.set_window_height(Some(&window), SizeChange::SetProportion(100.0));
+            self.niri.layout.set_window_width(Some(&window), SizeChange::SetProportion(100.0));
         }
     }
 }
