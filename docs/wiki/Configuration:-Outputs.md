@@ -14,8 +14,19 @@ output "eDP-1" {
     position x=1280 y=0
     variable-refresh-rate // on-demand=true
     focus-at-startup
-    background-color "#003300"
     backdrop-color "#001100"
+
+    hot-corners {
+        // off
+        top-left
+        // top-right
+        // bottom-left
+        // bottom-right
+    }
+
+    layout {
+        // ...layout settings for eDP-1...
+    }
 }
 
 output "HDMI-A-1" {
@@ -197,6 +208,8 @@ This is visible when you're not using any background tools like swaybg.
 
 <sup>Until: 25.05</sup> The alpha channel for this color will be ignored.
 
+<sup>Since: next release</sup> This setting is deprecated, set `background-color` in the [output `layout {}` block](#layout-config-overrides) instead.
+
 ```kdl
 output "HDMI-A-1" {
     background-color "#003300"
@@ -215,5 +228,85 @@ The alpha channel for this color will be ignored.
 ```kdl
 output "HDMI-A-1" {
     backdrop-color "#001100"
+}
+```
+
+### `hot-corners`
+
+<sup>Since: next release</sup>
+
+Customize the hot corners for this output.
+By default, hot corners [in the gestures settings](./Configuration:-Gestures.md#hot-corners) are used for all outputs.
+
+Hot corners toggle the overview when you put your mouse at the very corner of a monitor.
+
+`off` will disable the hot corners on this output, and writing specific corners will enable only those hot corners on this output.
+
+```kdl
+// Enable the bottom-left and bottom-right hot corners on HDMI-A-1.
+output "HDMI-A-1" {
+    hot-corners {
+        bottom-left
+        bottom-right
+    }
+}
+
+// Disable the hot corners on DP-2.
+output "DP-2" {
+    hot-corners {
+        off
+    }
+}
+```
+
+### Layout config overrides
+
+<sup>Since: next release</sup>
+
+You can customize layout settings for an output with a `layout {}` block:
+
+```kdl
+output "SomeCompany VerticalMonitor 1234" {
+    transform "90"
+
+    // Layout config overrides just for this output.
+    layout {
+        default-column-width { proportion 1.0; }
+
+        // ...any other setting.
+    }
+}
+
+output "SomeCompany UltrawideMonitor 1234" {
+    // Narrower proportions and more presets for an ultrawide.
+    layout {
+        default-column-width { proportion 0.25; }
+
+        preset-column-widths {
+            proportion 0.2
+            proportion 0.25
+            proportion 0.5
+            proportion 0.75
+            proportion 0.8
+        }
+    }
+}
+```
+
+It accepts all the same options as [the top-level `layout {}` block](./Configuration:-Layout.md).
+
+In order to unset a flag, write it with `false`, e.g.:
+
+```kdl
+layout {
+    // Enabled globally.
+    always-center-single-column
+}
+
+output "eDP-1" {
+    layout {
+        // Unset on this output.
+        always-center-single-column false
+    }
 }
 ```

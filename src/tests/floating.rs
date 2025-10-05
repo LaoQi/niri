@@ -795,7 +795,7 @@ window-rule {
     max-width 300
 }
 "##;
-    let config = Config::parse("test.kdl", config).unwrap();
+    let config = Config::parse_mem(config).unwrap();
     let mut f = Fixture::with_config(config);
     f.add_output(1, (1920, 1080));
     f.add_output(2, (1280, 720));
@@ -853,6 +853,23 @@ window-rule {
         f.client(id).window(&surface).format_recent_configures(),
         @"size: 300 × 100, bounds: 1920 × 1080, states: [Activated]"
     );
+}
+
+#[test]
+fn unmap_from_floating() {
+    let (mut f, id, surface) = set_up();
+
+    f.niri().layout.toggle_window_floating(None);
+    f.double_roundtrip(id);
+    let _ = f.client(id).window(&surface).recent_configures();
+
+    // Resize to something different on both axes.
+    let window = f.client(id).window(&surface);
+    window.attach_null();
+    window.commit();
+
+    // Shouldn't panic.
+    f.double_roundtrip(id);
 }
 
 #[test]

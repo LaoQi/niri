@@ -3,7 +3,7 @@ use std::time::Duration;
 
 use insta::assert_snapshot;
 use niri_config::animations::{Curve, EasingParams, Kind};
-use niri_config::{Config, FloatOrInt};
+use niri_config::Config;
 use niri_ipc::SizeChange;
 use smithay::utils::{Point, Size};
 use wayland_client::protocol::wl_surface::WlSurface;
@@ -44,12 +44,6 @@ fn create_window(f: &mut Fixture, id: ClientId, w: u16, h: u16) -> WlSurface {
     surface
 }
 
-fn complete_animations(niri: &mut Niri) {
-    niri.clock.set_complete_instantly(true);
-    niri.advance_animations();
-    niri.clock.set_complete_instantly(false);
-}
-
 fn set_time(niri: &mut Niri, time: Duration) {
     // This is a bit involved because we're dealing with an AdjustableClock that maintains its own
     // internal current_time.
@@ -80,7 +74,7 @@ fn set_up() -> Fixture {
     });
 
     let mut config = Config::default();
-    config.layout.gaps = FloatOrInt(0.0);
+    config.layout.gaps = 0.0;
     config.animations.window_resize.anim.kind = LINEAR;
     config.animations.window_movement.0.kind = LINEAR;
 
@@ -118,7 +112,7 @@ fn set_up_two_in_column() -> (Fixture, ClientId, WlSurface, WlSurface) {
     f.double_roundtrip(id);
 
     set_time(f.niri(), Duration::ZERO);
-    complete_animations(f.niri());
+    f.niri_complete_animations();
 
     (f, id, surface1, surface2)
 }
